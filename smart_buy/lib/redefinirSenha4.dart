@@ -21,20 +21,16 @@ class _RedefinirSenha4State extends State<RedefinirSenha4> {
               width: 150, // Ajuste o tamanho da imagem conforme necessário
               height: 150,
             ),
-
             SizedBox(height: 25),
-
             Text(
               'SENHA ALTERADA',
               style: TextStyle(
                 fontSize: 30,
                 fontWeight: FontWeight.bold,
-                color:  Color.fromRGBO(50, 186, 124, 1),
+                color: Color.fromRGBO(50, 186, 124, 1),
               ),
             ),
-
             SizedBox(height: 40),
-
             ElevatedButton(
               onPressed: () {
                 Navigator.pushReplacement(
@@ -43,13 +39,14 @@ class _RedefinirSenha4State extends State<RedefinirSenha4> {
                 );
               },
               style: ElevatedButton.styleFrom(
-                primary: Color.fromRGBO(50, 186, 124, 1),
+                backgroundColor: Color.fromRGBO(50, 186, 124, 1),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30.0),
                 ), // Cor verde definida por RGB
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: Text(
                   'Concluir',
                   style: TextStyle(fontSize: 18),

@@ -17,10 +17,12 @@ class _RedefinirSenha3State extends State<RedefinirSenha3> {
     bool hasDigit = false;
     bool hasSpecialCharacter = false;
 
-      for (int i = 0; i < senha.length; i++) {
-      if (senha[i].toUpperCase() == senha[i] && senha[i].toLowerCase() != senha[i]) {
+    for (int i = 0; i < senha.length; i++) {
+      if (senha[i].toUpperCase() == senha[i] &&
+          senha[i].toLowerCase() != senha[i]) {
         hasUppercase = true;
-      } else if (senha[i].toLowerCase() == senha[i] && senha[i].toUpperCase() != senha[i]) {
+      } else if (senha[i].toLowerCase() == senha[i] &&
+          senha[i].toUpperCase() != senha[i]) {
         hasLowercase = true;
       } else if (int.tryParse(senha[i]) != null) {
         hasDigit = true;
@@ -28,10 +30,10 @@ class _RedefinirSenha3State extends State<RedefinirSenha3> {
         hasSpecialCharacter = true;
       }
     }
-    
+
     if (senha.length >= 8) {
       if (hasUppercase && hasLowercase && hasDigit && hasSpecialCharacter) {
-      return PasswordStrength.Strong;
+        return PasswordStrength.Strong;
       }
       if ((hasUppercase || hasLowercase) && hasDigit) {
         return PasswordStrength.Medium;
@@ -56,18 +58,16 @@ class _RedefinirSenha3State extends State<RedefinirSenha3> {
 
   @override
   Widget build(BuildContext context) {
-      return Scaffold(
+    return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          Padding(
+      body: Column(children: [
+        Padding(
           padding: const EdgeInsets.symmetric(horizontal: 40),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(height: 50),
-
               Text(
                 'Altere sua senha',
                 style: TextStyle(
@@ -77,34 +77,27 @@ class _RedefinirSenha3State extends State<RedefinirSenha3> {
                 ),
                 textAlign: TextAlign.left,
               ),
-
               SizedBox(height: 25),
-
               Text(
                 'Digite abaixo sua nova senha:',
                 style: TextStyle(fontSize: 16),
               ),
-
               SizedBox(height: 35),
-
               TextField(
                 obscureText: true,
                 decoration: InputDecoration(
-                  labelText: 'Senha',
-                  enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(30.0),
-                  )
-                ),
+                    labelText: 'Senha',
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(30.0),
+                    )),
                 onChanged: (senha) {
                   setState(() {
                     password = senha;
                   });
                 },
               ),
-
               SizedBox(height: 10),
-
               Row(
                 children: List.generate(
                   3,
@@ -113,35 +106,29 @@ class _RedefinirSenha3State extends State<RedefinirSenha3> {
                       height: 5,
                       margin: EdgeInsets.only(right: index < 2 ? 10 : 0),
                       decoration: BoxDecoration(
-                        color: getStrengthColor(calculatePasswordStrength(password), index),
-                        borderRadius: BorderRadius.circular(5), // Borda arredondada
+                        color: getStrengthColor(
+                            calculatePasswordStrength(password), index),
+                        borderRadius:
+                            BorderRadius.circular(5), // Borda arredondada
                       ),
                     ),
                   ),
                 ),
               ),
-
               SizedBox(height: 13),
-
               Text(
                 '* A senha deve possuir no mínimo 8 caracteres. Incluindo números, letras maiúsculas, letras minúsculas e caracteres especiais.',
-                style: TextStyle(
-                  fontSize: 8,
-                  color: Colors.red
-                  ),
+                style: TextStyle(fontSize: 8, color: Colors.red),
               ),
-
               SizedBox(height: 30),
-
               TextField(
                 obscureText: true,
                 decoration: InputDecoration(
-                  labelText: 'Confirmar senha',
-                  enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(30.0),
-                  )
-                ),
+                    labelText: 'Confirmar senha',
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(30.0),
+                    )),
                 onChanged: (senha) {
                   setState(() {
                     confirmPassword = senha;
@@ -149,27 +136,27 @@ class _RedefinirSenha3State extends State<RedefinirSenha3> {
                 },
               ),
               SizedBox(height: 40),
-
-            Container(
-            width: double.infinity,
-            height: 40.0,
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => RedefinirSenha4()),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                primary: Color(0xFFE87C17),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0),
-                ),
-              ),
-              child: Text(
-                'Enviar',
-                style: TextStyle(fontSize: 18),
-              ),
+              Container(
+                width: double.infinity,
+                height: 40.0,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => RedefinirSenha4()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFFE87C17),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                    ),
+                  ),
+                  child: Text(
+                    'Enviar',
+                    style: TextStyle(fontSize: 18),
+                  ),
                 ),
               ),
             ],

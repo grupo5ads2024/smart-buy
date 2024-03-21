@@ -17,7 +17,6 @@ class _RedefinirSenhaDois extends State<RedefinirSenhaDois> {
       backgroundColor: Colors.white,
       body: Column(children: [
         SizedBox(height: 50),
-
         Text(
           "Enviamos um código \nde segurança",
           style: TextStyle(
@@ -25,9 +24,7 @@ class _RedefinirSenhaDois extends State<RedefinirSenhaDois> {
               fontSize: 33,
               color: Color(0xFFE87C17)),
         ),
-
         SizedBox(height: 40),
-
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -40,9 +37,7 @@ class _RedefinirSenhaDois extends State<RedefinirSenhaDois> {
             ),
           ],
         ),
-
         SizedBox(height: 40),
-
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 40),
           child: Container(
@@ -68,64 +63,63 @@ class _RedefinirSenhaDois extends State<RedefinirSenhaDois> {
             ),
           ),
         ),
-
         SizedBox(height: 50),
-
         Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 150.0,
-                height: 40.0,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginPage()), // Mudar aqui para a próxima página.
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.grey,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                    ),
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 150.0,
+              height: 40.0,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            LoginPage()), // Mudar aqui para a próxima página.
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0),
                   ),
-                  child: Text(
-                    'Cancelar',
-                    style: TextStyle(
-                      fontSize: 17,
-                    ),
+                ),
+                child: Text(
+                  'Cancelar',
+                  style: TextStyle(
+                    fontSize: 17,
                   ),
                 ),
               ),
-              
-              Container(
-                width: 150.0,
-                height: 40.0,
-                margin: EdgeInsets.only(left: 15.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => RedefinirSenha3()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    primary: Color(0xFFE87C17),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                    ),
+            ),
+            Container(
+              width: 150.0,
+              height: 40.0,
+              margin: EdgeInsets.only(left: 15.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => RedefinirSenha3()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFFE87C17),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0),
                   ),
-                  child: Text(
-                    'Próximo',
-                    style: TextStyle(
-                      fontSize: 17,
-                    ),
+                ),
+                child: Text(
+                  'Próximo',
+                  style: TextStyle(
+                    fontSize: 17,
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
+        ),
       ]),
     );
   }
