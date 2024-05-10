@@ -3,9 +3,81 @@ import 'package:smart_buy/cadastroEstabelecimentos.dart';
 import 'package:smart_buy/categoriaPage.dart';
 import 'package:smart_buy/estabelecimentos.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0;
+
+  final List<Widget> _pages = [
+    HomePageContent(),
+    CategoriaPage(),
+    Container(), // Placeholder for cart page
+    estabelecimentos(),
+    cadastroEstabelecimento(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        selectedItemColor: Color(0xFFE87C17),
+        onTap: _onItemTapped,
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.home,
+              color: Color(0xFFE87C17),
+            ),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.favorite,
+              color: Color(0xFFE87C17),
+            ),
+            label: 'Favoritos',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.shopping_cart,
+              color: Color(0xFFE87C17),
+            ),
+            label: 'Carrinho',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.business,
+              color: Color(0xFFE87C17),
+            ),
+            label: 'Estabelecimentos',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.add_business_outlined,
+              color: Color(0xFFE87C17),
+            ),
+            label: 'Cadastro de Estabelecimentos',
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+}
+
+class HomePageContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -142,73 +214,6 @@ class HomePage extends StatelessWidget {
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.home,
-              color: Color(0xFFE87C17),
-            ),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.favorite,
-              color: Colors.grey[400],
-            ),
-            label: 'Favoritos',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.shopping_cart,
-              color: Colors.grey[400],
-            ),
-            label: 'Carrinho',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.business,
-              color: Colors.grey[400],
-            ),
-            label: 'Estabelecimentos',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.add_business_outlined,
-              color: Colors.grey[400],
-            ),
-            label: 'Cadastro de Estabelecimentos',
-          ),
-        ],
-        onTap: (index) {
-          switch (index) {
-            case 0:
-              break;
-            case 1:
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => CategoriaPage()),
-              );
-              break;
-            case 2:
-              // carrinho
-              break;
-            case 3:
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => estabelecimentos()),
-              );
-              break;
-            case 4:
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => cadastroEstabelecimento()),
-              );
-              break;
-          }
-        },
       ),
     );
   }
