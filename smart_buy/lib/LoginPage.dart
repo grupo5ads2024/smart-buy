@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:smart_buy/CadastrarUsuario.dart';
-import 'package:smart_buy/home.dart';
+import 'package:smart_buy/CadastroUsuario.dart';
+import 'package:smart_buy/HomePage.dart';
 import 'package:smart_buy/redefinirSenha.dart';
+import 'package:smart_buy/database_helper.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _senhaController = TextEditingController();
 
   Widget _buildText(BuildContext context, String text,
       {double? fontSize, FontWeight? fontWeight, Color? color}) {
@@ -38,8 +48,9 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(
-      BuildContext context, String labelText, IconData prefixIcon) {
+  Widget _buildTextField(BuildContext context, String labelText,
+      IconData prefixIcon, TextEditingController controller,
+      {bool obscureText = false}) {
     return Padding(
       padding: EdgeInsets.symmetric(
           horizontal: MediaQuery.of(context).size.width * 0.1),
@@ -50,6 +61,8 @@ class LoginPage extends StatelessWidget {
           borderRadius: BorderRadius.circular(30),
         ),
         child: TextField(
+          controller: controller,
+          obscureText: obscureText,
           decoration: InputDecoration(
             prefixIcon: Padding(
               padding: const EdgeInsets.only(left: 15.0, right: 8.0),
@@ -90,9 +103,40 @@ class LoginPage extends StatelessWidget {
     return Container(
       width: MediaQuery.of(context).size.width * 0.8,
       child: ElevatedButton(
-        onPressed: () {
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => HomePage()));
+        onPressed: () async {
+          if (_formKey.currentState!.validate()) {
+            final dbHelper = DatabaseHelper();
+            final usuarios = await dbHelper.buscarTodosUsuarios();
+
+            final usuario = usuarios.firstWhere(
+              (user) =>
+                  user.email == _emailController.text &&
+                  user.senha == _senhaController.text,
+              orElse: () => Usuario(
+                  nome: '',
+                  documento: '',
+                  endereco: '',
+                  telefone: '',
+                  email: '',
+                  senha: '',
+                  estabelecimento: false),
+            );
+
+            if (usuario.nome.isNotEmpty) {
+              // Navegar para a tela principal, passando o usuário logado
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HomePage(usuarioLogado: usuario),
+                ),
+              );
+            } else {
+              // Mostrar mensagem de erro de login
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Usuário ou senha inválidos!')),
+              );
+            }
+          }
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Color(0xFFE87C17),
@@ -141,38 +185,42 @@ class LoginPage extends StatelessWidget {
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         padding: EdgeInsets.only(bottom: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(height: 20),
-            Image.asset(
-              'assets/images/smartbuy.png',
-              width: MediaQuery.of(context).size.width * 0.5,
-              height: MediaQuery.of(context).size.height * 0.1,
-            ),
-            SizedBox(height: 15),
-            _buildText(context, "BEM VINDO!",
-                fontSize: 0.08,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFFE87C17)),
-            SizedBox(height: 15),
-            _buildSignUpLink(context),
-            SizedBox(height: 30),
-            _buildText(context, "LOGIN",
-                fontSize: 0.06,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFFE87C17)),
-            SizedBox(height: 30),
-            _buildTextField(context, "Usuário", Icons.person),
-            SizedBox(height: 30),
-            _buildTextField(context, "Senha", Icons.lock),
-            SizedBox(height: 10),
-            _buildForgotPasswordLink(context),
-            SizedBox(height: 30),
-            _buildLoginButton(context),
-            SizedBox(height: 30),
-            _buildSocialIcons(),
-          ],
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(height: 20),
+              Image.asset(
+                'assets/images/smartbuy.png',
+                width: MediaQuery.of(context).size.width * 0.5,
+                height: MediaQuery.of(context).size.height * 0.1,
+              ),
+              SizedBox(height: 15),
+              _buildText(context, "BEM VINDO!",
+                  fontSize: 0.08,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFFE87C17)),
+              SizedBox(height: 15),
+              _buildSignUpLink(context),
+              SizedBox(height: 30),
+              _buildText(context, "LOGIN",
+                  fontSize: 0.06,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFFE87C17)),
+              SizedBox(height: 30),
+              _buildTextField(context, "Email", Icons.person, _emailController),
+              SizedBox(height: 30),
+              _buildTextField(context, "Senha", Icons.lock, _senhaController,
+                  obscureText: true),
+              SizedBox(height: 10),
+              _buildForgotPasswordLink(context),
+              SizedBox(height: 30),
+              _buildLoginButton(context),
+              SizedBox(height: 30),
+              _buildSocialIcons(),
+            ],
+          ),
         ),
       ),
     );

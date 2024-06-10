@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:smart_buy/LoginPage.dart';
-import 'package:smart_buy/redefinirSenha.dart';
 import 'package:smart_buy/redefinirSenha3.dart';
 
 class RedefinirSenhaDois extends StatefulWidget {
