@@ -3,30 +3,34 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:smart_buy/database_helper.dart';
 
-class CadastrarProduto extends StatefulWidget {
-  final Usuario usuarioLogado;
-  const CadastrarProduto({Key? key, required this.usuarioLogado})
-      : super(key: key);
+class EditarProduto extends StatefulWidget {
+  final Produto produto;
+
+  const EditarProduto({Key? key, required this.produto}) : super(key: key);
 
   @override
-  _CadastrarProdutoState createState() => _CadastrarProdutoState();
+  _EditarProdutoState createState() => _EditarProdutoState();
 }
 
-class _CadastrarProdutoState extends State<CadastrarProduto> {
+class _EditarProdutoState extends State<EditarProduto> {
   final _formKey = GlobalKey<FormState>();
   final _nomeProdutoController = TextEditingController();
   final _descricaoProdutoController = TextEditingController();
   final _precoProdutoController = TextEditingController();
   final _quantidadeProdutoController = TextEditingController();
-  File? _imagemProduto;
+  File? _novaImagemProduto;
   List<Categoria> _categorias = [];
   Categoria? _categoriaSelecionada;
-  int _usuarioId = 1;
 
   @override
   void initState() {
     super.initState();
     _carregarCategorias();
+    _nomeProdutoController.text = widget.produto.nome;
+    _descricaoProdutoController.text = widget.produto.descricao;
+    _precoProdutoController.text = widget.produto.preco.toString();
+    _quantidadeProdutoController.text = widget.produto.quantidade.toString();
+
   }
 
   Future<void> _carregarCategorias() async {
@@ -41,7 +45,7 @@ class _CadastrarProdutoState extends State<CadastrarProduto> {
         await picker.pickImage(source: ImageSource.gallery);
     if (imagemSelecionada != null) {
       setState(() {
-        _imagemProduto = File(imagemSelecionada.path);
+        _novaImagemProduto = File(imagemSelecionada.path);
       });
     }
   }
@@ -52,7 +56,7 @@ class _CadastrarProdutoState extends State<CadastrarProduto> {
         await picker.pickImage(source: ImageSource.camera);
     if (imagemSelecionada != null) {
       setState(() {
-        _imagemProduto = File(imagemSelecionada.path);
+        _novaImagemProduto = File(imagemSelecionada.path);
       });
     }
   }
@@ -66,26 +70,17 @@ class _CadastrarProdutoState extends State<CadastrarProduto> {
     super.dispose();
   }
 
-  void _limparCampos() {
-    _nomeProdutoController.clear();
-    _descricaoProdutoController.clear();
-    _precoProdutoController.clear();
-    _quantidadeProdutoController.clear();
-    setState(() {
-      _imagemProduto = null;
-      _categoriaSelecionada = null;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xFFE87C17),
-        title: Text("Cadastrar Produto",
+        title: Text(
+          'Editar Produto',
           style: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,),
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -96,27 +91,35 @@ class _CadastrarProdutoState extends State<CadastrarProduto> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               SizedBox(height: 20.0),
-              _imagemProduto != null
-                  ? Image.file(_imagemProduto!, height: 100, width: 100)
-                  : Icon(Icons.image, color: Color(0xFFE87C17),  size: 100),
+              _novaImagemProduto != null
+                  ? Image.file(_novaImagemProduto!, height: 100, width: 100)
+                  : widget.produto.imagemProduto != null
+                      ? Image.file(File(widget.produto.imagemProduto!),
+                          height: 100, width: 100)
+                      : Icon(Icons.image,
+                          color: Color(0xFFE87C17), size: 100),
               SizedBox(height: 20.0),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton(
                     onPressed: _selecionarImagemDaGaleria,
-                    child: Text('Galeria',
-                    style: TextStyle(
-                      color: Colors.black,
-                      ),),
+                    child: Text(
+                      'Galeria',
+                      style: TextStyle(
+                        color: Colors.black,
+                      ),
+                    ),
                   ),
                   SizedBox(width: 16),
                   ElevatedButton(
                     onPressed: _tirarFoto,
-                    child: Text('Câmera',
-                    style: TextStyle(
-                      color: Colors.black,
-                      ),),
+                    child: Text(
+                      'Câmera',
+                      style: TextStyle(
+                        color: Colors.black,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -126,15 +129,15 @@ class _CadastrarProdutoState extends State<CadastrarProduto> {
                 decoration: InputDecoration(
                   labelText: "Nome do Produto",
                   labelStyle: TextStyle(
-                  color: Colors.black, // Cor laranja para o texto da etiqueta
+                    color: Colors.black, // Cor laranja para o texto da etiqueta
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(40.0),
                   ),
                   focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFFE87C17)), // Borda laranja quando ativado
-                  borderRadius: BorderRadius.circular(40.0), // Borda arredondada quando ativado
-                ),
+                    borderSide: BorderSide(color: Color(0xFFE87C17)),
+                    borderRadius: BorderRadius.circular(40.0),
+                  ),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -149,15 +152,15 @@ class _CadastrarProdutoState extends State<CadastrarProduto> {
                 decoration: InputDecoration(
                   labelText: "Descrição do Produto",
                   labelStyle: TextStyle(
-                  color: Colors.black, // Cor laranja para o texto da etiqueta
+                    color: Colors.black, // Cor laranja para o texto da etiqueta
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(40.0),
                   ),
                   focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFFE87C17)), // Borda laranja quando ativado
-                  borderRadius: BorderRadius.circular(40.0), // Borda arredondada quando ativado
-                ),
+                    borderSide: BorderSide(color: Color(0xFFE87C17)),
+                    borderRadius: BorderRadius.circular(40.0),
+                  ),
                 ),
                 maxLines: 1,
                 validator: (value) {
@@ -172,15 +175,15 @@ class _CadastrarProdutoState extends State<CadastrarProduto> {
                 decoration: InputDecoration(
                   labelText: "Categoria",
                   labelStyle: TextStyle(
-                  color: Colors.black, // Cor laranja para o texto da etiqueta
+                    color: Colors.black, // Cor laranja para o texto da etiqueta
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(40.0),
                   ),
                   focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFFE87C17)), // Borda laranja quando ativado
-                  borderRadius: BorderRadius.circular(40.0), // Borda arredondada quando ativado
-                ),
+                    borderSide: BorderSide(color: Color(0xFFE87C17)),
+                    borderRadius: BorderRadius.circular(40.0),
+                  ),
                 ),
                 value: _categoriaSelecionada,
                 items: _categorias.map((categoria) {
@@ -207,15 +210,15 @@ class _CadastrarProdutoState extends State<CadastrarProduto> {
                 decoration: InputDecoration(
                   labelText: "Preço",
                   labelStyle: TextStyle(
-                  color: Colors.black, // Cor laranja para o texto da etiqueta
+                    color: Colors.black, // Cor laranja para o texto da etiqueta
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(40.0),
                   ),
                   focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFFE87C17)), // Borda laranja quando ativado
-                  borderRadius: BorderRadius.circular(40.0), // Borda arredondada quando ativado
-                ),
+                    borderSide: BorderSide(color: Color(0xFFE87C17)),
+                    borderRadius: BorderRadius.circular(40.0),
+                  ),
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
@@ -231,15 +234,15 @@ class _CadastrarProdutoState extends State<CadastrarProduto> {
                 decoration: InputDecoration(
                   labelText: "Quantidade",
                   labelStyle: TextStyle(
-                  color: Colors.black, // Cor laranja para o texto da etiqueta
+                    color: Colors.black, // Cor laranja para o texto da etiqueta
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(40.0),
                   ),
                   focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFFE87C17)), // Borda laranja quando ativado
-                  borderRadius: BorderRadius.circular(40.0), // Borda arredondada quando ativado
-                ),
+                    borderSide: BorderSide(color: Color(0xFFE87C17)),
+                    borderRadius: BorderRadius.circular(40.0),
+                  ),
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
@@ -260,32 +263,34 @@ class _CadastrarProdutoState extends State<CadastrarProduto> {
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     final dbHelper = DatabaseHelper();
-                    final produto = Produto(
+                    final produtoAtualizado = Produto(
+                      id: widget.produto.id,
                       nome: _nomeProdutoController.text,
                       descricao: _descricaoProdutoController.text,
                       imagemProduto:
-                          _imagemProduto != null ? _imagemProduto!.path : null,
+                          _novaImagemProduto?.path ?? widget.produto.imagemProduto,
                       preco: double.parse(_precoProdutoController.text),
                       quantidade: int.parse(_quantidadeProdutoController.text),
                       categoriaId: _categoriaSelecionada!.id!,
-                      usuarioId: _usuarioId,
+                      usuarioId: widget.produto.usuarioId,
                     );
 
-                    await dbHelper.inserirProduto(produto);
+                    await dbHelper.atualizarProduto(produtoAtualizado);
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                          content: Text('Produto cadastrado com sucesso!')),
+                          content: Text('Produto atualizado com sucesso!')),
                     );
 
-                    _limparCampos();
+                    Navigator.pop(context); // Voltar para a tela anterior
                   }
                 },
                 child: Text(
-                  "Salvar Produto",
+                  "Atualizar Produto",
                   style: TextStyle(
-                  color: Colors.white,
-                ),),
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ],
           ),

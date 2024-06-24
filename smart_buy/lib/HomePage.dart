@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:smart_buy/cadastroProdutos.dart';
-import 'package:smart_buy/cadastroCategoria.dart';
+import 'package:smart_buy/listarCategoria.dart'; // Import the CategoriaListPage
 import 'package:smart_buy/database_helper.dart';
 
 class HomePage extends StatefulWidget {
@@ -21,7 +21,7 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> _pages = [
     Container(),
-    CadastrarCategoria(),
+    ListarCategoriaPage(), // Change this to CategoriaListPage
     Container(),
   ];
 
@@ -73,17 +73,17 @@ class _HomePageState extends State<HomePage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(
-              Icons.add_home,
+              Icons.add_chart_outlined,
               color: Color(0xFFE87C17),
             ),
-            label: 'Cadastrar Categoria',
+            label: 'Categoria',
           ),
           BottomNavigationBarItem(
             icon: Icon(
-              Icons.addchart_sharp,
+              Icons.shopping_basket_rounded,
               color: Color(0xFFE87C17),
             ),
-            label: 'Cadastrar Produto',
+            label: 'Produto',
           ),
         ],
       ),

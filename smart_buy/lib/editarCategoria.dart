@@ -3,18 +3,30 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:smart_buy/database_helper.dart';
 
-class CadastrarCategoria extends StatefulWidget {
-  const CadastrarCategoria({Key? key}) : super(key: key);
+class EditarCategoria extends StatefulWidget {
+  final Categoria categoria;
+
+  const EditarCategoria({Key? key, required this.categoria}) : super(key: key);
 
   @override
-  _CadastrarCategoriaState createState() => _CadastrarCategoriaState();
+  _EditarCategoriaState createState() => _EditarCategoriaState();
 }
 
-class _CadastrarCategoriaState extends State<CadastrarCategoria> {
+class _EditarCategoriaState extends State<EditarCategoria> {
   final _formKey = GlobalKey<FormState>();
   final _nomeCategoriaController = TextEditingController();
   final _descricaoCategoriaController = TextEditingController();
   File? _imagemCategoria;
+
+  @override
+  void initState() {
+    super.initState();
+    _nomeCategoriaController.text = widget.categoria.nome;
+    _descricaoCategoriaController.text = widget.categoria.descricao;
+    if (widget.categoria.imagemCategoria != null) {
+      _imagemCategoria = File(widget.categoria.imagemCategoria!);
+    }
+  }
 
   Future<void> _selecionarImagemDaGaleria() async {
     final ImagePicker picker = ImagePicker();
@@ -45,7 +57,6 @@ class _CadastrarCategoriaState extends State<CadastrarCategoria> {
     super.dispose();
   }
 
-  // Função para limpar os campos do formulário
   void _limparCampos() {
     _nomeCategoriaController.clear();
     _descricaoCategoriaController.clear();
@@ -59,10 +70,11 @@ class _CadastrarCategoriaState extends State<CadastrarCategoria> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xFFE87C17),
-        title: Text("Cadastrar Categoria",
-        style: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
+        title: Text(
+          "Editar Categoria",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),
@@ -76,25 +88,27 @@ class _CadastrarCategoriaState extends State<CadastrarCategoria> {
               SizedBox(height: 20.0),
               _imagemCategoria != null
                   ? Image.file(_imagemCategoria!, height: 100, width: 100)
-                  : Icon(Icons.image, color: Color(0xFFE87C17) , size: 100),
+                  : Icon(Icons.image, color: Color(0xFFE87C17), size: 100),
               SizedBox(height: 20.0),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton(
                     onPressed: _selecionarImagemDaGaleria,
-                    child: Text('Galeria',
+                    child: Text(
+                      'Galeria',
                       style: TextStyle(
-                      color: Colors.black,
+                        color: Colors.black,
                       ),
                     ),
                   ),
                   SizedBox(width: 16),
                   ElevatedButton(
                     onPressed: _tirarFoto,
-                    child: Text('Câmera',
+                    child: Text(
+                      'Câmera',
                       style: TextStyle(
-                      color: Colors.black,
+                        color: Colors.black,
                       ),
                     ),
                   ),
@@ -106,15 +120,15 @@ class _CadastrarCategoriaState extends State<CadastrarCategoria> {
                 decoration: InputDecoration(
                   labelText: "Nome da Categoria",
                   labelStyle: TextStyle(
-                  color: Colors.black, // Cor laranja para o texto da etiqueta
+                    color: Colors.black,
                   ),
                   border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(40.0), // Borda arredondada
+                    borderRadius: BorderRadius.circular(40.0),
                   ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFFE87C17)), // Borda laranja quando ativado
-                  borderRadius: BorderRadius.circular(40.0), // Borda arredondada quando ativado
-                ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFFE87C17)),
+                    borderRadius: BorderRadius.circular(40.0),
+                  ),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -129,15 +143,15 @@ class _CadastrarCategoriaState extends State<CadastrarCategoria> {
                 decoration: InputDecoration(
                   labelText: "Descrição da Categoria",
                   labelStyle: TextStyle(
-                  color: Colors.black, // Cor laranja para o texto da etiqueta
+                    color: Colors.black,
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(40.0),
                   ),
                   focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFFE87C17)), // Borda laranja quando ativado
-                  borderRadius: BorderRadius.circular(40.0), // Borda arredondada quando ativado
-                ),
+                    borderSide: BorderSide(color: Color(0xFFE87C17)),
+                    borderRadius: BorderRadius.circular(40.0),
+                  ),
                 ),
                 maxLines: 1,
                 validator: (value) {
@@ -158,31 +172,32 @@ class _CadastrarCategoriaState extends State<CadastrarCategoria> {
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     final dbHelper = DatabaseHelper();
-                    final categoria = Categoria(
+                    final categoriaAtualizada = Categoria(
+                      id: widget.categoria.id,
                       nome: _nomeCategoriaController.text,
                       descricao: _descricaoCategoriaController.text,
-                      imagemCategoria: _imagemCategoria != null
-                          ? _imagemCategoria!.path
-                          : null,
+                      imagemCategoria:
+                          _imagemCategoria != null ? _imagemCategoria!.path : null,
                     );
 
-                    // Aguarda a inserção da categoria no banco de dados
-                    await dbHelper.inserirCategoria(categoria);
+                    await dbHelper.atualizarCategoria(categoriaAtualizada);
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                          content: Text('Categoria cadastrada com sucesso!')),
+                        content: Text('Categoria atualizada com sucesso!'),
+                      ),
                     );
 
-                    // Limpa os campos após salvar
-                    _limparCampos();
+                    // Atualizar a lista de categorias na tela anterior
+                    Navigator.pop(context, true); // Retorna true para indicar atualização
                   }
                 },
                 child: Text(
                   "Salvar Categoria",
                   style: TextStyle(
-                  color: Colors.white,
-                ),),
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ],
           ),
