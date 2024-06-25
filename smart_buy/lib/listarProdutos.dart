@@ -4,6 +4,9 @@ import 'package:smart_buy/cadastroProdutos.dart';
 import 'package:smart_buy/editarProduto.dart';
 
 class ListarProdutosPage extends StatefulWidget {
+  final Usuario usuarioLogado;
+  const ListarProdutosPage({Key? key, required this.usuarioLogado}) : super(key: key);
+
   @override
   _ListarProdutosPageState createState() => _ListarProdutosPageState();
 }
@@ -15,10 +18,10 @@ class _ListarProdutosPageState extends State<ListarProdutosPage> {
   @override
   void initState() {
     super.initState();
-    _carregarProdutos();
+    _loadProdutos();
   }
 
-  void _carregarProdutos() async {
+  void _loadProdutos() async {
     List<Produto> produtos = await _dbHelper.buscarTodosProdutos();
     setState(() {
       _produtos = produtos;
@@ -27,18 +30,19 @@ class _ListarProdutosPageState extends State<ListarProdutosPage> {
 
   void _deleteProduto(int id) async {
     await _dbHelper.deletarProduto(id);
-    _carregarProdutos();
+    _loadProdutos();
   }
 
-  void _editProduto(Produto produto) async {
-    await Navigator.push(
+  void _editProduto(Produto produto) {
+    Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditarProduto(produto: produto),
+        builder: (context) => EditarProduto(produto: produto, usuarioLogado: widget.usuarioLogado),
       ),
-    );
-
-    _carregarProdutos();
+    ).then((_) {
+      // Recarregar produtos após retornar da página de edição
+      _loadProdutos();
+    });
   }
 
   @override
@@ -61,16 +65,17 @@ class _ListarProdutosPageState extends State<ListarProdutosPage> {
               color: Colors.white,
             ),
             onPressed: () {
-              // Navegar para a tela de cadastro de produtos
-              //Navigator.push(
-              //  context,
-              //  MaterialPageRoute(
-              //    builder: (context) => CadastrarProduto(),
-              //  ),
-              //).then((_) {
+              // Implementar a navegação para a tela de cadastro de produtos
+              // Substitua CadastrarProduto() pela sua classe de cadastro de produtos
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CadastrarProduto(usuarioLogado: widget.usuarioLogado),
+                ),
+              ).then((_) {
                 // Recarregar produtos após retornar da página de cadastro
-              //  _carregarProdutos();
-              //});
+                _loadProdutos();
+              });
             },
           ),
         ],
@@ -82,36 +87,35 @@ class _ListarProdutosPageState extends State<ListarProdutosPage> {
           return Column(
             children: [
               ListTile(
-                leading: Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
+                contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                leading: produto.imagemProduto != null
+                    ? Image.network(
+                        produto.imagemProduto!,
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover,
+                      )
+                    : Icon(Icons.image, size: 70),
                 title: Text(
                   produto.nome,
                   style: TextStyle(
-                    fontSize: 18,
                     fontWeight: FontWeight.bold,
+                    fontSize: 18, // Fonte maior para o nome
                   ),
                 ),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Preço: R\$ ${produto.preco.toStringAsFixed(2)}',
+                      produto.descricao,
                       style: TextStyle(
-                        fontSize: 16,
+                        fontStyle: FontStyle.italic,
+                        fontSize: 12, // Descrição em itálico
                       ),
                     ),
                     SizedBox(height: 4),
-                    Text(
-                      'Quantidade: ${produto.quantidade}',
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
-                    ),
+                    Text('Quantidade: ${produto.quantidade}'),
+                    Text('Valor: R\$ ${produto.preco.toStringAsFixed(2)}'),
                   ],
                 ),
                 trailing: Row(
@@ -119,7 +123,7 @@ class _ListarProdutosPageState extends State<ListarProdutosPage> {
                   children: [
                     IconButton(
                       icon: Icon(Icons.edit),
-                      onPressed: () => _editProduto(produto),
+                      onPressed: () => _editProduto(produto), // Chame o método _editProduto aqui
                     ),
                     IconButton(
                       icon: Icon(Icons.delete),
@@ -128,10 +132,10 @@ class _ListarProdutosPageState extends State<ListarProdutosPage> {
                   ],
                 ),
               ),
-              Divider(
+              Divider( // Adiciona o Divider entre os itens da lista
                 color: Colors.grey[400],
-                thickness: 1,
-                height: 0,
+                thickness: 1, // Define a espessura da linha
+                height: 0, // Define a altura do Divider
               ),
             ],
           );

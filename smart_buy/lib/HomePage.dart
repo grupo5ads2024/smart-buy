@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:smart_buy/cadastroProdutos.dart';
-import 'package:smart_buy/listarCategoria.dart'; // Import the CategoriaListPage
+import 'package:smart_buy/listarCategoria.dart'; // Importe a página ListarCategoriaPage
 import 'package:smart_buy/database_helper.dart';
+import 'package:smart_buy/listarProdutos.dart';
 
 class HomePage extends StatefulWidget {
   final Usuario usuarioLogado;
@@ -19,16 +19,22 @@ class _HomePageState extends State<HomePage> {
   List<Categoria> _categorias = [];
   List<Produto> _produtos = [];
 
-  final List<Widget> _pages = [
-    Container(),
-    ListarCategoriaPage(), // Change this to CategoriaListPage
-    Container(),
-  ];
+  late final List<Widget> _pages;
 
   @override
   void initState() {
     super.initState();
     _carregarDados();
+    _pages = [
+      HomePageContent(
+        usuarioLogado: widget.usuarioLogado,
+        estabelecimentos: _estabelecimentos,
+        categorias: _categorias,
+        produtos: _produtos,
+      ),
+      ListarCategoriaPage(),
+      ListarProdutosPage(usuarioLogado: widget.usuarioLogado)
+    ];
   }
 
   Future<void> _carregarDados() async {
@@ -41,18 +47,13 @@ class _HomePageState extends State<HomePage> {
     _produtos = await dbHelper.buscarTodosProdutos()
       ..sort((a, b) => b.id!.compareTo(a.id!));
 
-    _pages[0] = HomePageContent(
-      usuarioLogado: widget.usuarioLogado,
-      estabelecimentos: _estabelecimentos,
-      categorias: _categorias,
-      produtos: _produtos,
-    );
-
-    _pages[2] = CadastrarProduto(
-      usuarioLogado: widget.usuarioLogado,
-    );
-
     setState(() {});
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
   @override
@@ -76,24 +77,18 @@ class _HomePageState extends State<HomePage> {
               Icons.add_chart_outlined,
               color: Color(0xFFE87C17),
             ),
-            label: 'Categoria',
+            label: 'Categorias',
           ),
           BottomNavigationBarItem(
             icon: Icon(
               Icons.shopping_basket_rounded,
               color: Color(0xFFE87C17),
             ),
-            label: 'Produto',
+            label: 'Produtos',
           ),
         ],
       ),
     );
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
   }
 }
 

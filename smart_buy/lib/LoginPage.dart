@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smart_buy/CadastroUsuario.dart';
 import 'package:smart_buy/HomePage.dart';
+import 'package:smart_buy/HomeConsumidor.dart';
 import 'package:smart_buy/redefinirSenha.dart';
 import 'package:smart_buy/database_helper.dart';
 
@@ -99,7 +100,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildLoginButton(BuildContext context) {
+ Widget _buildLoginButton(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.8,
       child: ElevatedButton(
@@ -124,12 +125,23 @@ class _LoginPageState extends State<LoginPage> {
 
             if (usuario.nome.isNotEmpty) {
               // Navegar para a tela principal, passando o usuário logado
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => HomePage(usuarioLogado: usuario),
-                ),
-              );
+              if (usuario.estabelecimento) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        HomePage(usuarioLogado: usuario),
+                  ),
+                );
+              } else {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        HomeConsumidor(usuarioLogado: usuario),
+                  ),
+                );
+              }
             } else {
               // Mostrar mensagem de erro de login
               ScaffoldMessenger.of(context).showSnackBar(
@@ -147,6 +159,7 @@ class _LoginPageState extends State<LoginPage> {
         child: Text(
           'Entrar',
           style: TextStyle(
+            color: Colors.white,
             fontSize: MediaQuery.of(context).size.width * 0.045,
           ),
         ),
@@ -190,7 +203,7 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height: 20),
+              SizedBox(height: 70),
               Image.asset(
                 'assets/images/smartbuy.png',
                 width: MediaQuery.of(context).size.width * 0.5,
@@ -201,11 +214,11 @@ class _LoginPageState extends State<LoginPage> {
                   fontSize: 0.08,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFFE87C17)),
-              SizedBox(height: 15),
+              SizedBox(height: 5),
               _buildSignUpLink(context),
               SizedBox(height: 30),
               _buildText(context, "LOGIN",
-                  fontSize: 0.06,
+                  fontSize: 0.07,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFFE87C17)),
               SizedBox(height: 30),

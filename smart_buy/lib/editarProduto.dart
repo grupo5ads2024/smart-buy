@@ -5,8 +5,8 @@ import 'package:smart_buy/database_helper.dart';
 
 class EditarProduto extends StatefulWidget {
   final Produto produto;
-
-  const EditarProduto({Key? key, required this.produto}) : super(key: key);
+  final Usuario usuarioLogado;
+  EditarProduto({required this.produto, required this.usuarioLogado});
 
   @override
   _EditarProdutoState createState() => _EditarProdutoState();
@@ -18,45 +18,36 @@ class _EditarProdutoState extends State<EditarProduto> {
   final _descricaoProdutoController = TextEditingController();
   final _precoProdutoController = TextEditingController();
   final _quantidadeProdutoController = TextEditingController();
-  File? _novaImagemProduto;
-  List<Categoria> _categorias = [];
-  Categoria? _categoriaSelecionada;
+  File? _imagemProduto;
 
   @override
   void initState() {
     super.initState();
-    _carregarCategorias();
     _nomeProdutoController.text = widget.produto.nome;
     _descricaoProdutoController.text = widget.produto.descricao;
     _precoProdutoController.text = widget.produto.preco.toString();
     _quantidadeProdutoController.text = widget.produto.quantidade.toString();
-
-  }
-
-  Future<void> _carregarCategorias() async {
-    final dbHelper = DatabaseHelper();
-    _categorias = await dbHelper.buscarTodasCategorias();
-    setState(() {});
+    if (widget.produto.imagemProduto != null) {
+      _imagemProduto = File(widget.produto.imagemProduto!);
+    }
   }
 
   Future<void> _selecionarImagemDaGaleria() async {
     final ImagePicker picker = ImagePicker();
-    final XFile? imagemSelecionada =
-        await picker.pickImage(source: ImageSource.gallery);
+    final XFile? imagemSelecionada = await picker.pickImage(source: ImageSource.gallery);
     if (imagemSelecionada != null) {
       setState(() {
-        _novaImagemProduto = File(imagemSelecionada.path);
+        _imagemProduto = File(imagemSelecionada.path);
       });
     }
   }
 
   Future<void> _tirarFoto() async {
     final ImagePicker picker = ImagePicker();
-    final XFile? imagemSelecionada =
-        await picker.pickImage(source: ImageSource.camera);
+    final XFile? imagemSelecionada = await picker.pickImage(source: ImageSource.camera);
     if (imagemSelecionada != null) {
       setState(() {
-        _novaImagemProduto = File(imagemSelecionada.path);
+        _imagemProduto = File(imagemSelecionada.path);
       });
     }
   }
@@ -70,13 +61,23 @@ class _EditarProdutoState extends State<EditarProduto> {
     super.dispose();
   }
 
+  void _limparCampos() {
+    _nomeProdutoController.clear();
+    _descricaoProdutoController.clear();
+    _precoProdutoController.clear();
+    _quantidadeProdutoController.clear();
+    setState(() {
+      _imagemProduto = null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xFFE87C17),
         title: Text(
-          'Editar Produto',
+          "Editar Produto",
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -91,13 +92,9 @@ class _EditarProdutoState extends State<EditarProduto> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               SizedBox(height: 20.0),
-              _novaImagemProduto != null
-                  ? Image.file(_novaImagemProduto!, height: 100, width: 100)
-                  : widget.produto.imagemProduto != null
-                      ? Image.file(File(widget.produto.imagemProduto!),
-                          height: 100, width: 100)
-                      : Icon(Icons.image,
-                          color: Color(0xFFE87C17), size: 100),
+              _imagemProduto != null
+                  ? Image.file(_imagemProduto!, height: 100, width: 100)
+                  : Icon(Icons.image, color: Color(0xFFE87C17), size: 100),
               SizedBox(height: 20.0),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -129,7 +126,7 @@ class _EditarProdutoState extends State<EditarProduto> {
                 decoration: InputDecoration(
                   labelText: "Nome do Produto",
                   labelStyle: TextStyle(
-                    color: Colors.black, // Cor laranja para o texto da etiqueta
+                    color: Colors.black,
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(40.0),
@@ -152,7 +149,7 @@ class _EditarProdutoState extends State<EditarProduto> {
                 decoration: InputDecoration(
                   labelText: "Descrição do Produto",
                   labelStyle: TextStyle(
-                    color: Colors.black, // Cor laranja para o texto da etiqueta
+                    color: Colors.black,
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(40.0),
@@ -171,46 +168,13 @@ class _EditarProdutoState extends State<EditarProduto> {
                 },
               ),
               SizedBox(height: 20.0),
-              DropdownButtonFormField<Categoria>(
-                decoration: InputDecoration(
-                  labelText: "Categoria",
-                  labelStyle: TextStyle(
-                    color: Colors.black, // Cor laranja para o texto da etiqueta
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(40.0),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFFE87C17)),
-                    borderRadius: BorderRadius.circular(40.0),
-                  ),
-                ),
-                value: _categoriaSelecionada,
-                items: _categorias.map((categoria) {
-                  return DropdownMenuItem(
-                    value: categoria,
-                    child: Text(categoria.nome),
-                  );
-                }).toList(),
-                onChanged: (categoria) {
-                  setState(() {
-                    _categoriaSelecionada = categoria;
-                  });
-                },
-                validator: (value) {
-                  if (value == null) {
-                    return 'Por favor, selecione uma categoria';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 20.0),
               TextFormField(
                 controller: _precoProdutoController,
+                keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  labelText: "Preço",
+                  labelText: "Preço do Produto",
                   labelStyle: TextStyle(
-                    color: Colors.black, // Cor laranja para o texto da etiqueta
+                    color: Colors.black,
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(40.0),
@@ -220,10 +184,12 @@ class _EditarProdutoState extends State<EditarProduto> {
                     borderRadius: BorderRadius.circular(40.0),
                   ),
                 ),
-                keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Por favor, insira o preço do produto';
+                  }
+                  if (double.tryParse(value) == null) {
+                    return 'Por favor, insira um valor válido';
                   }
                   return null;
                 },
@@ -231,10 +197,11 @@ class _EditarProdutoState extends State<EditarProduto> {
               SizedBox(height: 20.0),
               TextFormField(
                 controller: _quantidadeProdutoController,
+                keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  labelText: "Quantidade",
+                  labelText: "Quantidade do Produto",
                   labelStyle: TextStyle(
-                    color: Colors.black, // Cor laranja para o texto da etiqueta
+                    color: Colors.black,
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(40.0),
@@ -244,10 +211,12 @@ class _EditarProdutoState extends State<EditarProduto> {
                     borderRadius: BorderRadius.circular(40.0),
                   ),
                 ),
-                keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Por favor, insira a quantidade do produto';
+                  }
+                  if (int.tryParse(value) == null) {
+                    return 'Por favor, insira um valor válido';
                   }
                   return null;
                 },
@@ -267,11 +236,10 @@ class _EditarProdutoState extends State<EditarProduto> {
                       id: widget.produto.id,
                       nome: _nomeProdutoController.text,
                       descricao: _descricaoProdutoController.text,
-                      imagemProduto:
-                          _novaImagemProduto?.path ?? widget.produto.imagemProduto,
                       preco: double.parse(_precoProdutoController.text),
                       quantidade: int.parse(_quantidadeProdutoController.text),
-                      categoriaId: _categoriaSelecionada!.id!,
+                      imagemProduto: _imagemProduto != null ? _imagemProduto!.path : null,
+                      categoriaId: widget.produto.categoriaId,
                       usuarioId: widget.produto.usuarioId,
                     );
 
@@ -279,14 +247,16 @@ class _EditarProdutoState extends State<EditarProduto> {
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                          content: Text('Produto atualizado com sucesso!')),
+                        content: Text('Produto atualizado com sucesso!'),
+                      ),
                     );
 
-                    Navigator.pop(context); // Voltar para a tela anterior
+                    // Atualizar a lista de produtos na tela anterior
+                    Navigator.pop(context, true); // Retorna true para indicar atualização
                   }
                 },
                 child: Text(
-                  "Atualizar Produto",
+                  "Salvar Produto",
                   style: TextStyle(
                     color: Colors.white,
                   ),
