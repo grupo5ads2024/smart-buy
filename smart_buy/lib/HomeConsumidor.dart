@@ -170,45 +170,55 @@ class HomeConsumidorContent extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(
-              height: 100.0,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: estabelecimentos.length,
-                itemBuilder: (context, index) {
-                  final estabelecimento = estabelecimentos[index];
-                  return Padding(
-                    padding: EdgeInsets.only(
-                        left: index == 0 ? 20.0 : 10.0, top: 10.0),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: estabelecimentos.length,
+              itemBuilder: (context, index) {
+                final estabelecimento = estabelecimentos[index];
+                return Card(
+                  margin: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          height: 60.0,
-                          width: 60.0,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10.0),
-                            color: estabelecimento.imagemUsuario != null
-                                ? null
-                                : Colors.grey[400],
-                            image: estabelecimento.imagemUsuario != null
-                                ? DecorationImage(
-                                    image: FileImage(
-                                        File(estabelecimento.imagemUsuario!)),
-                                    fit: BoxFit.cover,
-                                  )
-                                : null,
+                        Text(
+                          estabelecimento.nome,
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                         SizedBox(height: 5.0),
                         Text(
-                          estabelecimento.nome,
-                          style: TextStyle(fontSize: 10.0),
+                          estabelecimento.endereco,
+                          style: TextStyle(
+                            fontSize: 14.0,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        SizedBox(height: 5.0),
+                        Text(
+                          'Horário: ${TimeOfDay.fromDateTime(estabelecimento.horaAbertura!).format(context)} - ${TimeOfDay.fromDateTime(estabelecimento.horaFechamento!).format(context)}',
+                          style: TextStyle(
+                            fontSize: 14.0,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        SizedBox(height: 5.0),
+                        Text(
+                          estabelecimento.telefone,
+                          style: TextStyle(
+                            fontSize: 14.0,
+                            color: Colors.grey[600],
+                          ),
                         ),
                       ],
                     ),
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             ),
           ],
         ),
