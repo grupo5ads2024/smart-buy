@@ -155,7 +155,7 @@ class HomePageContent extends StatelessWidget {
                       children: [
                         SizedBox(height: 7.0),
                         Text(
-                          'Bem vindo(a)',
+                          'Olá, seja bem-vindo(a)',
                           style: TextStyle(fontSize: 12.0),
                         ),
                         Text(
