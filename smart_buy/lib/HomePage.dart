@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:smart_buy/listarCategoria.dart'; // Importe a página ListarCategoriaPage
 import 'package:smart_buy/database_helper.dart';
 import 'package:smart_buy/listarProdutos.dart';
+import 'package:smart_buy/perfilEstabelecimento.dart'; // Importe a página PerfilPage
 
 class HomePage extends StatefulWidget {
   final Usuario usuarioLogado;
@@ -18,23 +19,12 @@ class _HomePageState extends State<HomePage> {
   List<Usuario> _estabelecimentos = [];
   List<Categoria> _categorias = [];
   List<Produto> _produtos = [];
-
-  late final List<Widget> _pages;
+  List<Widget> _pages = [];
 
   @override
   void initState() {
     super.initState();
     _carregarDados();
-    _pages = [
-      HomePageContent(
-        usuarioLogado: widget.usuarioLogado,
-        estabelecimentos: _estabelecimentos,
-        categorias: _categorias,
-        produtos: _produtos,
-      ),
-      ListarCategoriaPage(),
-      ListarProdutosPage(usuarioLogado: widget.usuarioLogado)
-    ];
   }
 
   Future<void> _carregarDados() async {
@@ -47,7 +37,19 @@ class _HomePageState extends State<HomePage> {
     _produtos = await dbHelper.buscarTodosProdutos()
       ..sort((a, b) => b.id!.compareTo(a.id!));
 
-    setState(() {});
+    setState(() {
+      _pages = [
+        HomePageContent(
+          usuarioLogado: widget.usuarioLogado,
+          estabelecimentos: _estabelecimentos,
+          categorias: _categorias,
+          produtos: _produtos,
+        ),
+        ListarCategoriaPage(),
+        ListarProdutosPage(usuarioLogado: widget.usuarioLogado),
+        PerfilEstabelecimento(estabelecimentoId: widget.usuarioLogado.id!), // Adicione a nova página aqui
+      ];
+    });
   }
 
   void _onItemTapped(int index) {
@@ -59,7 +61,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_selectedIndex],
+      body: _pages.isNotEmpty ? _pages[_selectedIndex] : Center(child: CircularProgressIndicator()),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         selectedItemColor: Color(0xFFE87C17),
@@ -85,6 +87,13 @@ class _HomePageState extends State<HomePage> {
               color: Color(0xFFE87C17),
             ),
             label: 'Produtos',
+          ),
+          BottomNavigationBarItem( // Adicione este item para a página de perfil
+            icon: Icon(
+              Icons.person,
+              color: Color(0xFFE87C17),
+            ),
+            label: 'Perfil',
           ),
         ],
       ),
@@ -119,13 +128,13 @@ class HomePageContent extends StatelessWidget {
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20.0),
+                      borderRadius: BorderRadius.circular(30.0),
                       color: Color(0xFFE87C17),
                     ),
                     padding: EdgeInsets.all(5.0),
                     child: usuarioLogado.imagemUsuario != null
                         ? ClipRRect(
-                            borderRadius: BorderRadius.circular(15.0),
+                            borderRadius: BorderRadius.circular(30.0),
                             child: Image.file(
                               File(usuarioLogado.imagemUsuario!),
                               width: 70,
