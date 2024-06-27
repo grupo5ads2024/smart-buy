@@ -1,8 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:smart_buy/cadastroProdutos.dart';
-import 'package:smart_buy/cadastroCategoria.dart';
+import 'package:smart_buy/listarCategoria.dart'; // Importe a página ListarCategoriaPage
 import 'package:smart_buy/database_helper.dart';
+import 'package:smart_buy/listarProdutos.dart';
+import 'package:smart_buy/perfilEstabelecimento.dart'; // Importe a página PerfilPage
 
 class HomePage extends StatefulWidget {
   final Usuario usuarioLogado;
@@ -18,12 +19,7 @@ class _HomePageState extends State<HomePage> {
   List<Usuario> _estabelecimentos = [];
   List<Categoria> _categorias = [];
   List<Produto> _produtos = [];
-
-  final List<Widget> _pages = [
-    Container(),
-    CadastrarCategoria(),
-    Container(),
-  ];
+  List<Widget> _pages = [];
 
   @override
   void initState() {
@@ -41,24 +37,31 @@ class _HomePageState extends State<HomePage> {
     _produtos = await dbHelper.buscarTodosProdutos()
       ..sort((a, b) => b.id!.compareTo(a.id!));
 
-    _pages[0] = HomePageContent(
-      usuarioLogado: widget.usuarioLogado,
-      estabelecimentos: _estabelecimentos,
-      categorias: _categorias,
-      produtos: _produtos,
-    );
+    setState(() {
+      _pages = [
+        HomePageContent(
+          usuarioLogado: widget.usuarioLogado,
+          estabelecimentos: _estabelecimentos,
+          categorias: _categorias,
+          produtos: _produtos,
+        ),
+        ListarCategoriaPage(),
+        ListarProdutosPage(usuarioLogado: widget.usuarioLogado),
+        PerfilEstabelecimento(estabelecimentoId: widget.usuarioLogado.id!), // Adicione a nova página aqui
+      ];
+    });
+  }
 
-    _pages[2] = CadastrarProduto(
-      usuarioLogado: widget.usuarioLogado,
-    );
-
-    setState(() {});
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_selectedIndex],
+      body: _pages.isNotEmpty ? _pages[_selectedIndex] : Center(child: CircularProgressIndicator()),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         selectedItemColor: Color(0xFFE87C17),
@@ -73,27 +76,28 @@ class _HomePageState extends State<HomePage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(
-              Icons.add_home,
+              Icons.add_chart_outlined,
               color: Color(0xFFE87C17),
             ),
-            label: 'Cadastrar Categoria',
+            label: 'Categorias',
           ),
           BottomNavigationBarItem(
             icon: Icon(
-              Icons.addchart_sharp,
+              Icons.shopping_basket_rounded,
               color: Color(0xFFE87C17),
             ),
-            label: 'Cadastrar Produto',
+            label: 'Produtos',
+          ),
+          BottomNavigationBarItem( // Adicione este item para a página de perfil
+            icon: Icon(
+              Icons.person,
+              color: Color(0xFFE87C17),
+            ),
+            label: 'Perfil',
           ),
         ],
       ),
     );
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
   }
 }
 
@@ -124,13 +128,13 @@ class HomePageContent extends StatelessWidget {
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20.0),
+                      borderRadius: BorderRadius.circular(30.0),
                       color: Color(0xFFE87C17),
                     ),
                     padding: EdgeInsets.all(5.0),
                     child: usuarioLogado.imagemUsuario != null
                         ? ClipRRect(
-                            borderRadius: BorderRadius.circular(15.0),
+                            borderRadius: BorderRadius.circular(30.0),
                             child: Image.file(
                               File(usuarioLogado.imagemUsuario!),
                               width: 70,
@@ -151,7 +155,7 @@ class HomePageContent extends StatelessWidget {
                       children: [
                         SizedBox(height: 7.0),
                         Text(
-                          'Bem vindo(a)',
+                          'Olá, seja bem-vindo(a)',
                           style: TextStyle(fontSize: 12.0),
                         ),
                         Text(

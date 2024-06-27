@@ -291,7 +291,8 @@ class _CadastrarUsuarioState extends State<CadastrarUsuario> {
                     Navigator.pop(context); // Volta para a tela de login
                   }
                 },
-                child: Text('Cadastrar'),
+                child: Text('Cadastrar',
+                style: TextStyle(color: Colors.white),),
               ),
             ],
           ),
